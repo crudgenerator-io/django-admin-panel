@@ -1,0 +1,3 @@
+{% load file_info %}
+<input type="file" name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %} {% if widget.is_initial %} value="{{ widget.value|file_info }}" {% endif %}>
+<input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %} hidden/>

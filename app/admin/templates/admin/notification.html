@@ -1,0 +1,5 @@
+{% for message in messages %}
+    <div>
+        <span>{{ message|safe }}</span> <a href="#" class="material-icons" data-action="close-notification">cancel</a>
+    </div>
+{% endfor %}

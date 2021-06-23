@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="18px"
+   viewBox="0 0 24 24"
+   width="18px"
+   fill="#000000"
+   version="1.1"
+   id="svg6"
+   sodipodi:docname="help_outline_black_18dp.svg"
+   inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07, custom)">
+  <metadata
+     id="metadata12">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs10" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     id="namedview8"
+     showgrid="false"
+     inkscape:zoom="39.722222"
+     inkscape:cx="7.8481154"
+     inkscape:cy="9.0202378"
+     inkscape:window-x="0"
+     inkscape:window-y="34"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg6"
+     inkscape:document-rotation="0" />
+  <path
+     d="m 12.155148,3.3998981 c -2.8531255,0 -5.1640281,2.3109024 -5.1640281,5.1640276 h 2.582014 c 0,-1.4201076 1.1619071,-2.5820138 2.5820141,-2.5820138 1.420107,0 2.582014,1.1619062 2.582014,2.5820138 0,2.5820143 -3.873021,2.2592623 -3.873021,6.4550333 h 2.582014 c 0,-2.904764 3.873021,-3.227515 3.873021,-6.4550333 0,-2.8531252 -2.310903,-5.1640276 -5.164028,-5.1640276 z"
+     id="path892"
+     style="stroke-width:1.29101" />
+  <path
+     d="m 10.88865,19.725357 h 2.582013 V 17.143343 H 10.88865 Z"
+     id="path4"
+     style="stroke-width:1.29101" />
+</svg>

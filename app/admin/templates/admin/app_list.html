@@ -1,0 +1,23 @@
+{% load i18n %}
+
+{% if app_list %}
+  <ul class="nav">
+    {% for app in app_list %}
+      <li class="nav-separator">{{ app.app_label|title }}</li>
+      {% for model in app.models %}
+        <li class="nav-item {% if model.admin_url in request.path %}active{% endif %}">
+          {% if model.admin_url %}
+              <a href="{{ model.admin_url }}">
+                <p>{{ model.name }}</p>
+              </a>
+            {% else %}
+              <i class="material-icons">folder</i>
+               <p>{{ model.name }}</p>
+            {% endif %}
+        </li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>{% translate 'You don’t have permission to view or edit anything.' %}</p>
+{% endif %}

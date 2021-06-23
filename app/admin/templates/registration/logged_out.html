@@ -1,0 +1,35 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/full-page-form.min.css" %}">{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block content_title %}{% endblock %}
+
+
+{% block pagetype %}full-page-form{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <div class="card-header__heading">
+            <h4 class="card-header__heading__text">Logged out </h4>
+            <div class="card-header__heading__underline"></div>
+            <div class="card-header__heading__informational">
+                <p>
+                    {% translate "Thanks for spending some quality time with the Web site today. :)" %}
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="card-footer">
+        <a class="material-button unobtrusive" href="{% url 'admin:index' %}">{% translate 'Log in again' %}</a>
+    </div>
+</div>
+
+<script src="{% static "admin/js/full-page-form.min.js" %}" defer></script>
+
+{% endblock %}

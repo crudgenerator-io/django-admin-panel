@@ -1,0 +1,428 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static admin_list %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/list.min.css" %}">
+  <link rel="stylesheet" type="text/css" href="{% static "admin/css/changelists.css" %}">
+  {% if cl.formset %}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}">
+  {% endif %}
+  {% if cl.formset or action_form %}
+    <script src="{% url 'admin:jsi18n' %}"></script>
+  {% endif %}
+  {{ media.css }}
+  {% if not actions_on_top and not actions_on_bottom %}
+    <style>
+      #changelist table thead th:first-child {width: inherit}
+    </style>
+  {% endif %}
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<script src="{% static 'admin/js/list.min.js' %}" defer></script>
+
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }}app-{{ opts.app_label }} model-{{ opts.model_name }} change-list{% endblock %}
+
+{% block pagetype %}list{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+<i class="material-icons separator">keyboard_arrow_right</i>
+<a href="{% url 'admin:app_list' app_label=cl.opts.app_label %}">{{ cl.opts.app_config.verbose_name }}</a>
+ <i class="material-icons separator">keyboard_arrow_right</i>
+{{ cl.opts.verbose_name_plural|capfirst }}
+{% endblock %}
+{% endif %}
+
+
+{% block content %}
+<form method="post" novalidate {% if cl.filter_specs.0.lookup_expressions %}has-filters{% endif %}>{% csrf_token %}
+    <div class="ss-desktop">
+        <div class="card">
+        <div class="card-header">
+            <template data-type="all-records-actions">
+                    {% if cl.formset and cl.formset.errors %}
+                    <p class="errornote">
+                        {% if cl.formset.total_error_count == 1 %}{% translate "Please correct the error below." %}{% else %}{% translate "Please correct the errors below." %}{% endif %}
+                    </p>
+                    {{ cl.formset.non_form_errors }}
+                    {% endif %}
+
+                    {% block date_hierarchy %}{% if cl.date_hierarchy %}{% date_hierarchy cl %}{% endif %}{% endblock %}
+
+                    {% if cl.formset %}
+                        <div id="management-form">{{ cl.formset.management_form }}</div>
+                    {% endif %}
+
+                    <i class="material-icons clickable sidebar-action-btn" data-type="filters">filter_list</i>
+                    <div class="applied-filters__container">
+                        {% for applied_filter in cl.filter_specs.0.lookup_expressions %}
+                            <div class="applied-filters__filter">
+                                <div class="filter-chip selectable" data-url-expression="{{ applied_filter.2 }}">
+                                    <span class="chip-text">{{ applied_filter.0 }}</span>
+                                    <span class="chip-icon"><i class="material-icons">cancel</i></span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% url cl.opts|admin_urlname:'add' as add_url %}
+                    <a id="go-to__create" class="material-button contained" href="{% add_preserved_filters add_url is_popup to_field %}"><i class="material-icons">add</i><span>add</span></a>
+                </template>
+                <template data-type="selected-records-actions">
+                    {% if action_form and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+                </template>
+        </div>
+        <div class="card-body">
+            {% block result_list %}
+                {% if cl.result_count > 0 %}
+                    {% result_list cl %}
+                {% else %}
+                    <p id="no-records-text">No records found.</p>
+                {% endif %}
+            {% endblock %}
+        </div>
+        <div class="card-footer">
+            {% block pagination %}{% pagination cl request.GET.p %}{% endblock %}
+        </div>
+
+    </div>
+    </div>
+
+
+    <div class="ss-mobile">
+        <div id="mobile-actions-row">
+            <button type="button" class="sidebar-action-btn" data-type="filters"></button>
+            <button type="button" class="sidebar-action-btn" data-type="applied-filters-mobile"></button>
+            <button type="button" class="sidebar-action-btn" data-type="selection-actions-mobile"></button>
+            <button type="button" class="sidebar-action-btn" data-type="sort"></button>
+        </div>
+        <div id="mobile-paging-info-heading">
+           <div id="paging-info__mobile__wrap"></div>
+        </div>
+
+        <div id="mobile-paging-info-footing"></div>
+    </div>
+</form>
+
+
+
+<div id="side-sheet">
+    <div id="side-sheet__content">
+        <template data-type="filters">
+                <div id="side-sheet__inner">
+                    <div class="side-sheet__inner__headline">
+                        <h6 class="side-sheet__inner__headline__text">Filter</h6>
+                        <i id="side-sheet__inner__headline__close-btn" class="material-icons clickable">close</i>
+                    </div>
+                    <div class="side-sheet__inner__content">
+                        <div id="side-sheet__inner__content__mobile-filters-views">
+                                    <span class="side-sheet__inner__content__sub-headline">Parameter</span>
+                                    <div class="material-select filled">
+                                        {% filter_parameters cl attrs='id="side-sheet__inner__content__field-type__select" class="selectpicker"' %}
+                                        <span class="highlight"></span>
+                                        <span class="bar"></span>
+                                        <label>Field</label>
+                                    </div>
+                                    <div id="side-sheet__inner__content__field-type__content">
+                                        <template data-type="text">
+                                            <span class="side-sheet__inner__content__sub-headline">Operator</span>
+                                            <div class="choice-group">
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="exact" name="indigo"/>
+                                                    <label for="exact">Exact</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notExact" name="indigo"/>
+                                                    <label for="notExact">Not Exact</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" checked id="contains" name="indigo"/>
+                                                    <label for="contains">Contains</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notContains" name="indigo"/>
+                                                    <label for="notContains">Not Contains</label>
+                                                </div>
+                                            </div>
+                                            <span class="side-sheet__inner__content__sub-headline">Value</span>
+                                            <div class="material-input filled">
+                                                <input type="text" required>
+                                                <span class="highlight"></span>
+                                                <span class="bar"></span>
+                                                <label>Text</label>
+                                            </div>
+                                        </template>
+                                        <template data-type="number">
+                                            <span class="side-sheet__inner__content__sub-headline">Operator</span>
+                                            <div class="choice-group">
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="lessThan" name="indigo"/>
+                                                    <label for="lessThan">Less Than</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="largerThan" name="indigo"/>
+                                                    <label for="largerThan">Larger Than</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" checked id="equals" name="indigo"/>
+                                                    <label for="equals">Equals</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notEquals" name="indigo"/>
+                                                    <label for="notEquals">Not Equals</label>
+                                                </div>
+                                            </div>
+                                            <span class="side-sheet__inner__content__sub-headline">Value</span>
+                                            <div class="material-input filled">
+                                                <input type="number" required>
+                                                <span class="highlight"></span>
+                                                <span class="bar"></span>
+                                                <label>Number</label>
+                                            </div>
+                                        </template>
+                                        <template data-type="boolean">
+                                            <span class="side-sheet__inner__content__sub-headline">Is positive ?</span>
+                                            <div class="switch">
+                                                <input type="checkbox" id="switch1" class="switch__input" checked>
+                                                <label for="switch1" class="switch__label"></label>
+                                            </div>
+                                        </template>
+                                        <template data-type="date">
+                                            <span class="side-sheet__inner__content__sub-headline">Operator</span>
+                                            <div class="choice-group">
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="lessThan" name="indigo"/>
+                                                    <label for="lessThan">Before</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="largerThan" name="indigo"/>
+                                                    <label for="largerThan">After</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" checked id="exact" name="indigo"/>
+                                                    <label for="exact">Exact</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notExact" name="indigo"/>
+                                                    <label for="notExact">Not Exact</label>
+                                                </div>
+                                            </div>
+                                            <span class="side-sheet__inner__content__sub-headline">Value</span>
+                                            <div class="material-input filled leading-icon" role="wrapper">
+                                                <input type="text" required class="datepicker">
+                                                <span class="highlight"></span>
+                                                <span class="bar"></span>
+                                                <label>Date</label>
+                                            </div>
+                                        </template>
+                                        <template data-type="time">
+                                            <span class="side-sheet__inner__content__sub-headline">Operator</span>
+                                            <div class="choice-group">
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="lessThan" name="indigo"/>
+                                                    <label for="lessThan">Before</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="largerThan" name="indigo"/>
+                                                    <label for="largerThan">After</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" checked id="exact" name="indigo"/>
+                                                    <label for="exact">Exact</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notExact" name="indigo"/>
+                                                    <label for="notExact">Not Exact</label>
+                                                </div>
+                                            </div>
+                                            <span class="side-sheet__inner__content__sub-headline">Value</span>
+                                            <div class="material-input filled leading-icon" role="wrapper">
+                                                <input type="text" required class="timepicker">
+                                                <span class="highlight"></span>
+                                                <span class="bar"></span>
+                                                <label>Time</label>
+                                            </div>
+                                        </template>
+                                        <template data-type="datetime">
+                                            <span class="side-sheet__inner__content__sub-headline">Operator</span>
+                                            <div class="choice-group">
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="lessThan" name="indigo"/>
+                                                    <label for="lessThan">Before</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="largerThan" name="indigo"/>
+                                                    <label for="largerThan">After</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" checked id="exact" name="indigo"/>
+                                                    <label for="exact">Exact</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notExact" name="indigo"/>
+                                                    <label for="notExact">Not Exact</label>
+                                                </div>
+                                            </div>
+                                            <span class="side-sheet__inner__content__sub-headline">Value</span>
+                                            <div class="material-input filled leading-icon" role="wrapper">
+                                                <input type="text" required class="datetimepicker">
+                                                <span class="highlight"></span>
+                                                <span class="bar"></span>
+                                                <label>Date & Time</label>
+                                            </div>
+                                        </template>
+                                        <template data-type="enum">
+                                            <span class="side-sheet__inner__content__sub-headline">Operator</span>
+                                            <div class="choice-group">
+                                                <div class="material-checkbox">
+                                                    <input type="radio" checked id="exact" name="indigo"/>
+                                                    <label for="exact">Is</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notExact" name="indigo"/>
+                                                    <label for="notExact">Is Not</label>
+                                                </div>
+                                            </div>
+                                            <span class="side-sheet__inner__content__sub-headline">Option</span>
+                                            {% enumerations cl 'class="selectpicker"' as enums %}
+                                            {% for enum in enums %}
+                                                <div class="material-select filled">
+                                                    {{ enum }}
+                                                    <span class="highlight"></span>
+                                                    <span class="bar"></span>
+                                                    <label>Type</label>
+                                                </div>
+                                            {% endfor %}
+                                        </template>
+                                        <template data-type="relationship">
+                                            <span class="side-sheet__inner__content__sub-headline">Operator</span>
+                                            <div class="choice-group">
+                                                <div class="material-checkbox">
+                                                    <input type="radio" checked id="exact" name="indigo"/>
+                                                    <label for="exact">Is</label>
+                                                </div>
+                                                <div class="material-checkbox">
+                                                    <input type="radio" id="notExact" name="indigo"/>
+                                                    <label for="notExact">Is Not</label>
+                                                </div>
+                                            </div>
+                                            <span class="side-sheet__inner__content__sub-headline">Relationship</span>
+                                            {% relationships cl 'class="selectpicker"' as relationships %}
+                                            {% for relationship in relationships %}
+                                                <div class="material-select filled">
+                                                    {{ relationship.widget }}
+                                                    <span class="highlight"></span>
+                                                    <span class="bar"></span>
+                                                    <label>{{ relationship.label }}</label>
+                                                </div>
+                                            {% endfor %}
+                                        </template>
+                                    </div>
+                        </div>
+                    </div>
+                    <div class="side-sheet__inner__footer">
+                        <button id="side-sheet__inner__footer__save-btn" class="material-button contained" disabled>save</button>
+                    </div>
+                </div>
+            </template>
+        <template data-type="sort">
+                <div id="side-sheet__inner">
+                    <div class="side-sheet__inner__headline">
+                        <h6 class="side-sheet__inner__headline__text">Sort</h6>
+                        <i id="side-sheet__inner__headline__close-btn" class="material-icons clickable">close</i>
+                    </div>
+                    <div class="side-sheet__inner__content">
+                        <div class="side-sheet__inner__content__sub-headline">Parameter</div>
+                        <div class="material-select filled">
+                            <select id="side-sheet__inner__content__field-type__select" class="selectpicker">
+                                {% for sort_param in cl.sortable_by %}
+                                    <option value="{{sort_param}}">{{sort_param|title}}</option>
+                                {% endfor %}
+                            </select>
+                            <span class="highlight"></span>
+                            <span class="bar"></span>
+                            <label>Field</label>
+                        </div>
+                        <div class="side-sheet__inner__content__sub-headline">Direction</div>
+                        <div id="side-sheet__inner__content__sort-direction">
+                            <div class="material-checkbox">
+                                <input type="radio" checked id="sort-direction-radio__asc" name="sort-direction-radio"/>
+                                <label for="sort-direction-radio__asc">Ascending</label>
+                            </div>
+                            <div class="material-checkbox">
+                                <input type="radio" id="sort-direction-radio__desc" name="sort-direction-radio"/>
+                                <label for="sort-direction-radio__desc">Descending</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side-sheet__inner__footer">
+                        <button id="side-sheet__inner__footer__save-btn" class="material-button contained">sort</button>
+                    </div>
+                </div>
+            </template>
+        <template data-type="applied-filters-mobile">
+                <div id="side-sheet__inner">
+                    <div class="side-sheet__inner__headline">
+                        <h6 class="side-sheet__inner__headline__text">Filters</h6>
+                        <i id="side-sheet__inner__headline__expand-btn" class="material-icons clickable">expand_less</i>
+                    </div>
+                    <div class="side-sheet__inner__content">
+                        <span class="side-sheet__inner__content__sub-headline">Applied filters</span>
+                        <div class="side-sheet__inner__mobile__applied-filter-wrap">
+                            {% for applied_filter in cl.filter_specs.0.lookup_expressions %}
+                                <div class="applied-filters__filter">
+                                    <div class="filter-chip selectable" data-url-expression="{{ applied_filter.2 }}">
+                                        <span class="chip-text">{{ applied_filter.0 }}</span>
+                                        <span class="chip-icon"><i class="material-icons">cancel</i></span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="side-sheet__inner__footer">
+                        <button id="side-sheet__inner__footer__save-btn" class="material-button contained">Clear All</button>
+                    </div>
+                </div>
+            </template>
+        <template data-type="selection-actions-mobile">
+                <div id="side-sheet__inner">
+                    <div class="side-sheet__inner__headline">
+                        <h6 class="side-sheet__inner__headline__text">1 selected</h6>
+                        <i id="side-sheet__inner__headline__expand-btn" class="material-icons clickable">expand_less</i>
+                        <button id="side-sheet__inner__headline__close-btn" style="display:none"></button>
+                    </div>
+                    <div class="side-sheet__inner__content">
+                        <div class="side-sheet__inner__mobile__applied-filter-wrap">
+                            <span class="side-sheet__inner__content__sub-headline">Action to perform </span>
+                            <div class="side-sheet__inner__mobile__selection-actions">
+                                {% if action_form and cl.show_admin_actions %}{% admin_actions %}{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="side-sheet__inner__footer">
+                        <div id="cards-selection-buttons">
+                            <button id="select-all-mobile" class="material-button text">Select All</button>
+                            <button id="unselect-all-mobile" class="material-button text">Unselect All</button>
+                        </div>
+                        <button id="side-sheet__inner__footer__save-btn" class="material-button contained" disabled>Perform Action</button>
+                    </div>
+                </div>
+            </template>
+    </div>
+</div>
+<div id="side-sheet__backdrop"></div>
+
+    {% block object-tools %}
+        {% block object-tools-items %}
+            {% change_list_object_tools %}
+        {% endblock %}
+    {% endblock %}
+
+
+{% endblock %}

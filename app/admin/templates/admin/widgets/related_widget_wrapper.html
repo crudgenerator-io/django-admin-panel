@@ -1,0 +1,41 @@
+{% load i18n static %}
+{{ rendered_widget }}
+{% block links %}
+    {% spaceless %}
+        {% if not is_hidden %}
+            {% if can_add_related or can_change_related or can_delete_related %}
+                <div class="dropdown related-widget-dropdown">
+                    <i class="material-icons clickable" id="relationship_dropdown__{{ name }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">more_horiz</i>
+                    <div class="dropdown-menu" aria-labelledby="relationship_dropdown__{{ name }}">
+                        {% if can_add_related %}
+                            <a class="related-widget-wrapper-link add-related dropdown-item" id="add_related__id_{{ name }}"
+                               href="{{ add_related_url }}?{{ url_params }}"
+                               title="{% blocktranslate %}Add another {{ model }}{% endblocktranslate %}">
+                                 Add
+                            </a>
+                        {% endif %}
+
+                        {% if can_change_related or can_delete_related %}
+                            <div class="dropdown-divider"></div>
+                            <div class="dropdown-header">Selected </div>
+                            {% if can_change_related %}
+                                <a class="related-widget-wrapper-link change-related dropdown-item" id="change_related__id_{{ name }}"
+                                    data-href-template="{{ change_related_template_url }}?{{ url_params }}"
+                                    title="{% blocktranslate %}Change selected {{ model }}{% endblocktranslate %}">
+                                    Edit
+                                </a>
+                            {% endif %}
+                            {% if can_delete_related %}
+                                <a class="related-widget-wrapper-link delete-related dropdown-item" id="delete_id_{{ name }}"
+                                   data-href-template="{{ delete_related_template_url }}?{{ url_params }}"
+                                   title="{% blocktranslate %}Delete selected {{ model }}{% endblocktranslate %}">
+                                    Delete
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endspaceless %}
+{% endblock %}

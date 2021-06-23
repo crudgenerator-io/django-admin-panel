@@ -1,0 +1,17 @@
+{% extends "admin/index.html" %}
+{% load i18n %}
+
+{% block bodyclass %}{{ block.super }} app-{{ app_label }}{% endblock %}
+
+{% if not is_popup %}
+{% block breadcrumbs %}
+<a href="{% url 'admin:index' %}">{% translate 'Home' %}</a>
+<i class="material-icons separator">keyboard_arrow_right</i>
+{% for app in app_list %}
+    {{ app.name }}
+{% endfor %}
+
+{% endblock %}
+{% endif %}
+
+{% block sidebar %}{% endblock %}

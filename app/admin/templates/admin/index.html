@@ -1,0 +1,92 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/index.css" %}">{% endblock %}
+
+{% block bodyclass %}{{ block.super }}dashboard nav-extended{% endblock %}
+
+{% block pretitle %}{% endblock %}
+
+{% block pagetype %}index{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+
+<script src="{% static 'admin/js/index.js' %}" defer></script>
+
+{% endblock %}
+
+
+{% block content %}
+<div id="site-administration" class="card">
+    <div class="card-header">
+        {% block content_title %}{% if title %}{{ title }}{% endif %}{% endblock %}
+    </div>
+    <div class="card-body">
+        {% if app_list %}
+                {% for app in app_list %}
+                    <p class="entities-group__title">{{ app.app_label|title }}</p>
+                    <div class="entities-group__models">
+                        {% for model in app.models %}
+                            {% if model.admin_url %}
+                                <a href="{{ model.admin_url }}" class="entities-group__models__model">
+                                    <p>{{ model.name }}</p>
+                                    <div class="entities-group__models__model__upper-number">{{ model.objects_count }}</div>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+        {% else %}
+        <p>{% translate 'You don’t have permission to view or edit anything.' %}</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+<div id="recent-actions-card" class="card">
+    <div class="card-header">{% translate 'Recent actions' %}</div>
+    <div class="card-body">
+        {% load log %}
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+                <p>{% translate 'None available' %}</p>
+            {% else %}
+                <table id="recent-actions-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Performed by</th>
+                            <th scope="col">Action</th>
+                            <th scope="col">Enitity</th>
+                            <th scope="col">Timestamp</th>
+                            <th scope="col">Link</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for entry in admin_log %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{% if entry.is_addition %}added{% endif %}{% if entry.is_change %}changed{% endif %}{% if entry.is_deletion %}deleted{% endif %}</td>
+                            <td>{% if entry.content_type %}
+                                        {% filter capfirst %}{{ entry.content_type.name }}{% endfilter %}
+                                        {% else %}
+                                            {% translate 'Unknown content' %}
+                                        {% endif %}
+                            </td>
+                            <td>
+                                {{ entry.action_time }}
+                            </td>
+                            <td>{% if entry.is_deletion or not entry.get_admin_url %}
+                                        {{ entry.object_repr }}
+                                    {% else %}
+                                        <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                                    {% endif %}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+    </div>
+</div>
+{% endblock %}

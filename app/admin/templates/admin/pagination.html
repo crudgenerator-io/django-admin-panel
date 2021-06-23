@@ -1,0 +1,22 @@
+{% load admin_list %}
+{% load i18n %}
+
+    <div id="paging-info__page-size">
+                <label for="page-size-select">Rows per page:</label>
+                <select id="page-size-select" tabindex="-98">
+                    <option>10</option>
+                    <option>20</option>
+                    <option>50</option>
+                    <option>100</option>
+                </select>
+            </div>
+
+    <span id="paging-info__text">{{ info }}</span>
+    <div id="paging-info__nav-buttons">
+        <a href="{% if has_prev %}{{ prev_page }}{% else %}#{% endif %}" >
+            <i class="material-icons paging-info__btn clickable" {% if not has_prev %}disabled{% endif %}>keyboard_arrow_left</i>
+        </a>
+        <a href="{% if has_next %}{{ next_page }}{% else %}#{% endif %}">
+            <i class="material-icons paging-info__btn clickable" {% if not has_next %}disabled{% endif %}>keyboard_arrow_right</i>
+        </a>
+    </div>

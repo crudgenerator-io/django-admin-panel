@@ -1,0 +1,52 @@
+{% load i18n %}
+
+<div id="side-navbar" class="extending">
+    <nav id="side-navbar__content">
+      <div class="user">
+            <div class="user-welcome">
+              <h5>Welcome, </h5>
+            </div>
+            <div class="user-info">
+                <div class="user-info-text-container">
+                    <span>{% firstof request.user.get_full_name request.user.username %}</span><br/>
+                    <span>{{ request.user.email }}</span>
+                </div>
+                <div class="user-info-dropdown-container">
+                    {% block usertools %}
+                        {% if has_permission %}
+                            <i class="material-icons" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">keyboard_arrow_down</i>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                {% block userlinks %}
+                                    {% if site_url %}
+                                        <a class="dropdown-item" href="{{ site_url }}">
+                                            <span>{% translate 'View site' %}</span>
+                                        </a>
+                                    {% endif %}
+                                    {% if user.is_active and user.is_staff %}
+                                        {% url 'django-admindocs-docroot' as docsroot %}
+                                        {% if docsroot %}
+                                            <a class="dropdown-item" href="{{ docsroot }}">
+                                                <span>{% translate 'Documentation' %}</span>
+                                            </a>
+                                        {% endif %}
+                                    {% endif %}
+                                    {% if user.has_usable_password %}
+                                        <a class="dropdown-item" href="{% url 'admin:password_change' %}">
+                                            <span>{% translate 'Change password' %}</span>
+                                        </a>
+                                    {% endif %}
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item" href="{% url 'admin:logout' %}">
+                                        <span>{% translate 'Log out' %}</span>
+                                    </a>
+                                {% endblock %}
+                            </div>
+                        {% endif %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+      {% include 'admin/app_list.html' with app_list=available_apps show_changelinks=False %}
+    </nav>
+    <div id="side-navbar__backdrop"></div>
+</div>
